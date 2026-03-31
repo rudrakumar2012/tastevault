@@ -1,21 +1,78 @@
 'use server'
 
 import { revalidatePath } from 'next/cache';
-// We will uncomment these once your Drizzle DB is fully set up!
-// import { db } from '../db';
-// import { recipes } from '../db/schema';
+import { auth } from '../auth';
+import { db } from '../db';
+import { savedRecipes } from '../db/schema';
+import { eq } from 'drizzle-orm';
 
-export async function saveApiRecipe(title: string, category: string) {
-  const description = `A delicious ${category} dish discovered via TasteVault.`;
+export async function saveApiRecipe(title: string, category: string, mealId: string, image?: string) {
+  const session = await auth();
 
-  console.log(`Simulating saving to DB: ${title} - ${description}`);
+  if (!session?.user) {
+    throw new Error('Unauthorized: Must be logged in to save recipes');
+  }
 
-  // TODO: Re-enable this when Neon DB is ready
-  // await db.insert(recipes).values({
-  //   title,
-  //   description,
-  // });
+  // Check if already saved
+  const existing = await db
+    .select()
+    .from(savedRecipes)
+    .where(eq(savedRecipes.userId, session.user.id), eq(savedRecipes.mealId, mealId))
+    .limit(1);
+
+  if (existing.length > 0) {
+    // Already saved, no need to insert
+    return { success: true, message: 'Recipe already saved' };
+  }
+
+  // Insert new saved recipe
+  await db.insert(savedRecipes).values({
+    userId: session.user.id,
+    mealId,
+    title,
+    image: image || null,
+    category: category || null,
+    note: '',
+  });
 
   // Refreshes the page data silently
-  revalidatePath('/'); 
+  revalidatePath('/');
+  revalidatePath('/dashboard');
+
+  return { success: true, message: 'Recipe saved to vault' };
 }
+
+export async function unsaveRecipe(mealId: string) {
+  const session = await auth();
+
+  if (!session?.user) {
+    throw new Error('Unauthorized: Must be logged in to unsave recipes');
+  }
+
+  await db
+    .delete(savedRecipes)
+    .where(eq(savedRecipes.userId, session.user.id), eq(savedRecipes.mealId, mealId));
+
+  revalidatePath('/');
+  revalidatePath('/dashboard');
+
+  return { success: true, message: 'Recipe removed from vault' };
+}
+
+export async function updateRecipeNote(mealId: string, note: string) {
+  const session = await auth();
+
+  if (!session?.user) {
+    throw new Error('Unauthorized: Must be logged in to update notes');
+  }
+
+  await db
+    .update(savedRecipes)
+    .set({ note: note.trim() || null })
+    .where(eq(savedRecipes.userId, session.user.id), eq(savedRecipes.mealId, mealId));
+
+  revalidatePath('/dashboard');
+
+  return { success: true, message: 'Note updated' };
+}
+

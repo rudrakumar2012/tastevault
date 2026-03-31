@@ -1,8 +1,16 @@
-// app/recipe/[id]/page.tsx
+import { auth } from '../../../auth';
+import { redirect } from 'next/navigation';
 
 export default async function RecipeDetail({ params }: { params: Promise<{ id: string }> }) {
-  // NEXT.JS 15 FIX: We have to await the params now!
-  const { id } = await params; 
+  const session = await auth();
+
+  if (!session?.user) {
+    // Redirect to sign-in page with callback URL to return after auth
+    const { id } = await params;
+    redirect(`/api/auth/signin?callbackUrl=/recipe/${id}`);
+  }
+
+  const { id } = await params;
 
   const res = await fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${id}`);
   const data = await res.json();
@@ -14,7 +22,7 @@ export default async function RecipeDetail({ params }: { params: Promise<{ id: s
   for (let i = 1; i <= 20; i++) {
     const ingredient = meal[`strIngredient${i}`];
     const measure = meal[`strMeasure${i}`];
-    
+
     if (ingredient && ingredient.trim() !== '') {
       ingredients.push(`${measure} ${ingredient}`);
     }
@@ -29,10 +37,10 @@ export default async function RecipeDetail({ params }: { params: Promise<{ id: s
       <h1 style={{ fontSize: '3rem', margin: '10px 0' }}>{meal.strMeal}</h1>
       <p style={{ color: '#A1A1AA', marginBottom: '30px' }}>{meal.strCategory} | {meal.strArea}</p>
 
-      <img 
-        src={meal.strMealThumb} 
-        alt={meal.strMeal} 
-        style={{ width: '100%', height: '400px', objectFit: 'cover', borderRadius: '16px', marginBottom: '40px' }} 
+      <img
+        src={meal.strMealThumb}
+        alt={meal.strMeal}
+        style={{ width: '100%', height: '400px', objectFit: 'cover', borderRadius: '16px', marginBottom: '40px' }}
       />
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '40px' }}>

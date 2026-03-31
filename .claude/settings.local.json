@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls -la .env*)",
+      "Bash(ls:*)",
+      "Bash(node:*)",
+      "Bash(npm list:*)",
+      "Bash(npm install:*)",
+      "Bash(cat drizzle/*.sql)",
+      "Bash(npx drizzle-kit:*)",
+      "Bash(git add:*)",
+      "Bash(git reset:*)"
+    ]
+  }
+}
