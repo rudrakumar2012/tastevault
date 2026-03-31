@@ -3,30 +3,37 @@
 ## Overview
 TasteVault is a recipe discovery and personal vault application built with Next.js 16 and React 19. Users can search for recipes from Themealdb API, view detailed recipes, and save their favorite recipes to a personal vault with custom notes.
 
-## Current State (as of 2026-03-31)
+## Current State (as of 2026-04-01)
 - **Authentication**: ✅ NextAuth v5 (beta) with **dual providers**:
   - Google OAuth (one-click sign-in)
   - Email/password (credentials-based with bcrypt hashing)
-- **Database**: PostgreSQL (Neon serverless) with Drizzle ORM
+  - Custom sign-in (`/auth/signin`) and registration (`/auth/register`) pages
+- **Database**: ✅ PostgreSQL (Neon serverless) with Drizzle ORM - **migrations applied**
   - Tables: `users` (with password hash), `account` (NextAuth), `saved_recipes` (user-saved recipes with notes)
+  - Migration: `drizzle/0000_gorgeous_the_professor.sql` (includes password column)
 - **Frontend**:
   - Dark theme with colors: background `#0B0E14`, secondary `#18181B`, accent `#69F6B8`
   - Inline styles (no Tailwind CSS component classes)
-  - Client components: Navbar, RecipeCard
-  - Server components: Home, RecipeDetail, Dashboard, Auth pages
-  - Server actions: saveApiRecipe, registerUser
+  - Client components: Navbar, RecipeCard, Dashboard (client for state)
+  - Server components: Home, RecipeDetail, Auth pages
+  - Server actions: saveApiRecipe, unsaveRecipe, updateRecipeNote, registerUser
 - **API Integration**: Themealdb API for recipe data
-- **Features implemented**:
+- **API Endpoints**:
+  - `GET /api/saved-recipes` - fetch user's saved recipes (requires auth)
+- **Features implemented** (✅ Complete):
   - ✅ Recipe discovery with random terms fallback
   - ✅ Search functionality
   - ✅ Recipe detail pages (protected: redirect to login if not authenticated)
-  - ✅ Save recipe to vault with real database insert (user-specific)
-  - ✅ Custom authentication pages: `/auth/signin`, `/auth/register`
-  - ✅ Dashboard page (`/dashboard`) showing saved recipes
-  - ✅ Save button logic: disabled with "Sign in to save" when logged out; "Save to Vault" when logged in; "✓ Saved" when already saved
-  - ✅ Navbar shows sign-in/sign-out and user avatar
-  - ✅ Home page shows correct saved state for each recipe card
-  - ✅ Email/password registration with server-side validation and bcrypt hashing
+  - ✅ Save recipe to vault (user-specific, DB insert)
+  - ✅ Unsave recipe (remove from vault)
+  - ✅ Custom authentication: sign-in + registration with email/password
+  - ✅ Dashboard page (`/dashboard`) with saved recipes grid
+  - ✅ Editable notes: add, edit, save, clear notes per saved recipe
+  - ✅ Category filter dropdown on dashboard
+  - ✅ Save button states: "Sign in to save" (logged out), "Save to Vault" (logged in unsaved), "Unsave" (saved)
+  - ✅ Home page shows correct saved state per user (fetched server-side)
+  - ✅ Navbar: auth state, user avatar, sign-in/sign-out, "My Vault" link
+  - ✅ Real-time UI updates with server action revalidation
 
 ## Auth Configuration
 - **session strategy**: JWT
@@ -70,20 +77,40 @@ Required:
 - **SessionProvider**: Must wrap root layout for client-side auth hooks
 - **Server-only DB**: `db/index.ts` should only be imported in server components/actions
 
-## Development Priorities (remaining)
-1. ⚠️ **Database migration**: Add `password` column to `users` table:
-   - `npx drizzle-kit generate`
-   - `npx drizzle-kit migrate`
-2. **Google OAuth**: Ensure authorized origins/redirect URIs match localhost:3000
-3. **Optional enhancements**:
-   - Edit notes on saved recipes (edit `saved_recipes.note`)
-   - Show saved notes on recipe detail page for saved items
-   - Add unsave functionality (delete from `saved_recipes`)
-   - Email verification for credentials accounts
-   - Password reset flow
-   - Loading states/skeletons in UI
-   - Form validation improvements
-   - Toast notifications for actions
+## Development Priorities
+
+### ✅ Completed (as of 2026-04-01)
+- [x] Database setup with Neon + Drizzle ORM
+- [x] Dual authentication: Google OAuth + email/password (bcrypt)
+- [x] Custom sign-in and registration pages
+- [x] Protected recipe detail routes (redirect to login)
+- [x] Dashboard with saved recipes
+- [x] Save/Unsave functionality
+- [x] Editable notes (add, edit, clear)
+- [x] Category filter on dashboard
+- [x] API endpoint for fetching saved recipes
+- [x] Database migration with `password` column
+
+### Optional Enhancements (future work)
+- Email verification for credentials accounts
+- Password reset flow
+- Show saved recipe notes on recipe detail page
+- Loading skeletons/UI polish
+- Toast notifications for save/unsave/note actions
+- Improved form validation (real-time feedback)
+- Ability to reorder saved recipes
+- Recipe search within vault
+- Export/import vault list
+- Share recipe link with saved note
+- Progressive Web App (PWA) support
+- Recipe meal planning/scheduling features
+
+## Quick Start
+1. Ensure `.env.local` has `DATABASE_URL`, `NEXTAUTH_SECRET`, `NEXTAUTH_URL`
+2. Run `npx drizzle-kit migrate` (already done on dev DB)
+3. Run `npm run dev`
+4. Visit `http://localhost:3000`
+5. Sign up or sign in to start saving recipes
 
 ## Technical Stack
 - Next.js 16.2.1
