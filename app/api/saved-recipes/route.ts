@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { auth } from '../../../auth';
 import { db } from '../../../db';
 import { savedRecipes } from '../../../db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, desc } from 'drizzle-orm';
 
 export async function GET() {
   const session = await auth();
@@ -16,7 +16,7 @@ export async function GET() {
     .select()
     .from(savedRecipes)
     .where(eq(savedRecipes.userId, userId))
-    .orderBy({ createdAt: 'desc' });
+    .orderBy(desc(savedRecipes.createdAt));
 
   return NextResponse.json(userSavedRecipes);
 }
