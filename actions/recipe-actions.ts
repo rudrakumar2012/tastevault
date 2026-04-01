@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { auth } from '../auth';
 import { db } from '../db';
 import { savedRecipes } from '../db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 
 export async function saveApiRecipe(
   title: string,
@@ -25,7 +25,7 @@ export async function saveApiRecipe(
   const existing = await db
     .select()
     .from(savedRecipes)
-    .where(eq(savedRecipes.userId, userId), eq(savedRecipes.mealId, mealId))
+    .where(and(eq(savedRecipes.userId, userId), eq(savedRecipes.mealId, mealId)))
     .limit(1);
 
   if (existing.length > 0) {
@@ -34,7 +34,7 @@ export async function saveApiRecipe(
       await db
         .update(savedRecipes)
         .set({ note: note.trim() || null })
-        .where(eq(savedRecipes.userId, userId), eq(savedRecipes.mealId, mealId));
+        .where(and(eq(savedRecipes.userId, userId), eq(savedRecipes.mealId, mealId)));
       revalidatePath('/dashboard');
       return { success: true, message: 'Note updated' };
     }
@@ -69,7 +69,7 @@ export async function unsaveRecipe(mealId: string) {
 
   await db
     .delete(savedRecipes)
-    .where(eq(savedRecipes.userId, userId), eq(savedRecipes.mealId, mealId));
+    .where(and(eq(savedRecipes.userId, userId), eq(savedRecipes.mealId, mealId)));
 
   revalidatePath('/');
   revalidatePath('/my-kitchen');
@@ -89,7 +89,7 @@ export async function updateRecipeNote(mealId: string, note: string) {
   await db
     .update(savedRecipes)
     .set({ note: note.trim() || null })
-    .where(eq(savedRecipes.userId, userId), eq(savedRecipes.mealId, mealId));
+    .where(and(eq(savedRecipes.userId, userId), eq(savedRecipes.mealId, mealId)));
 
   revalidatePath('/my-kitchen');
 
