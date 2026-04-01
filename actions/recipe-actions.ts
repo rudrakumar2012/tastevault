@@ -15,15 +15,17 @@ export async function saveApiRecipe(
 ) {
   const session = await auth();
 
-  if (!session?.user) {
+  if (!session?.user?.id) {
     throw new Error('Unauthorized: Must be logged in to save recipes');
   }
+
+  const userId = session.user.id;
 
   // Check if already saved
   const existing = await db
     .select()
     .from(savedRecipes)
-    .where(eq(savedRecipes.userId, session.user.id), eq(savedRecipes.mealId, mealId))
+    .where(eq(savedRecipes.userId, userId), eq(savedRecipes.mealId, mealId))
     .limit(1);
 
   if (existing.length > 0) {
@@ -32,7 +34,7 @@ export async function saveApiRecipe(
       await db
         .update(savedRecipes)
         .set({ note: note.trim() || null })
-        .where(eq(savedRecipes.userId, session.user.id), eq(savedRecipes.mealId, mealId));
+        .where(eq(savedRecipes.userId, userId), eq(savedRecipes.mealId, mealId));
       revalidatePath('/dashboard');
       return { success: true, message: 'Note updated' };
     }
@@ -41,7 +43,7 @@ export async function saveApiRecipe(
 
   // Insert new saved recipe
   await db.insert(savedRecipes).values({
-    userId: session.user.id,
+    userId,
     mealId,
     title,
     image: image || null,
@@ -59,13 +61,15 @@ export async function saveApiRecipe(
 export async function unsaveRecipe(mealId: string) {
   const session = await auth();
 
-  if (!session?.user) {
+  if (!session?.user?.id) {
     throw new Error('Unauthorized: Must be logged in to unsave recipes');
   }
 
+  const userId = session.user.id;
+
   await db
     .delete(savedRecipes)
-    .where(eq(savedRecipes.userId, session.user.id), eq(savedRecipes.mealId, mealId));
+    .where(eq(savedRecipes.userId, userId), eq(savedRecipes.mealId, mealId));
 
   revalidatePath('/');
   revalidatePath('/my-kitchen');
@@ -76,14 +80,16 @@ export async function unsaveRecipe(mealId: string) {
 export async function updateRecipeNote(mealId: string, note: string) {
   const session = await auth();
 
-  if (!session?.user) {
+  if (!session?.user?.id) {
     throw new Error('Unauthorized: Must be logged in to update notes');
   }
+
+  const userId = session.user.id;
 
   await db
     .update(savedRecipes)
     .set({ note: note.trim() || null })
-    .where(eq(savedRecipes.userId, session.user.id), eq(savedRecipes.mealId, mealId));
+    .where(eq(savedRecipes.userId, userId), eq(savedRecipes.mealId, mealId));
 
   revalidatePath('/my-kitchen');
 
