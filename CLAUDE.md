@@ -41,6 +41,19 @@ PostgreSQL (Neon serverless) with Drizzle ORM - **migrations applied**
 - **Server components**: Home (landing page with Bento Grid + 3D hero), RecipeDetail, Auth pages, About/Blog/Help/Contact pages
 - **Server actions**: saveApiRecipe, unsaveRecipe, updateRecipeNote, registerUser
 
+### 🚀 Production Deployment (April 2026)
+- **Live URL**: https://tastevault-swart.vercel.app
+- **Vercel configuration**: `vercel.json` with function timeout settings
+- **Build issues resolved**:
+  - Fixed Drizzle ORM `.where()` syntax: use `and()` to combine multiple conditions
+  - Fixed Drizzle `.orderBy()`: use `desc(column)` instead of `{ column: 'desc' }`
+  - Resolved NextAuth v5 config: removed invalid `url`/`baseURL` properties
+  - Fixed TypeScript strict mode: proper `session.user.id` validation before use
+  - Fixed `useSearchParams()` SSR issue: wrapped in Suspense boundary
+  - Type-safe Set handling: explicit `Set<string>` annotations
+  - Fixed `updateRecipeNote` parameter: always pass `string` (not `string | undefined`)
+- **Policy compliance**: Updated Privacy Policy and Terms of Service to April 2026
+
 ### ✅ API Integration
 - Themealdb API for recipe data
 - API endpoints:
@@ -62,11 +75,12 @@ PostgreSQL (Neon serverless) with Drizzle ORM - **migrations applied**
 - Real-time UI updates with server action revalidation
 
 ### ✅ Deployment Ready
-- Vercel configuration: `vercel.json` created
+- Vercel configuration: `vercel.json` created with function timeout (30s)
 - Comprehensive README.md with deployment instructions
 - Environment variables documented
-- Build errors fixed (import paths, TypeScript strictness)
-- Ready for GitHub + Vercel auto-deploy
+- **Production deployed**: https://tastevault-swart.vercel.app
+- Build errors resolved (TypeScript strict mode, Drizzle syntax, NextAuth v5, Next.js 16 Suspense)
+- Auto-deploy configured from GitHub main branch
 
 ## Auth Configuration
 - **Session strategy**: JWT
@@ -110,12 +124,18 @@ Required:
 ## Important Notes & Breaking Changes
 - **Next.js 16/React 19**: APIs differ from standard training docs
   - `searchParams` and `params` are Promises requiring `await`
+  - `useSearchParams()` requires Suspense boundary in client components during SSR
   - Read `node_modules/next/dist/docs/` for accurate info
 - **NextAuth v5**: Uses `auth()` for server-side session access; `signIn()`/`signOut()` from `next-auth/react` or custom `auth.ts`
+  - Config: `baseURL` is not valid; use `NEXTAUTH_URL` env var instead
 - **SessionProvider**: Must wrap root layout for client-side auth hooks
 - **Server-only DB**: `db/index.ts` should only be imported in server components/actions
+- **Drizzle ORM**: 
+  - `.where()` with multiple conditions: use `and(eq(...), eq(...))` not `where(eq(...), eq(...))`
+  - `.orderBy()`: use `desc(column)` or `asc(column)`, not `{ column: 'desc' }`
 - **SVG in React**: Use camelCase for SVG attributes (`strokeWidth`, `strokeLinecap`, `strokeLinejoin`)
 - **JSX comments**: Use `{/* */}` not `<!-- -->` inside SVG/JSX
+- **TypeScript strict mode**: Always validate `session.user.id` explicitly with `?.id` check before using
 
 ## Development Priorities
 
