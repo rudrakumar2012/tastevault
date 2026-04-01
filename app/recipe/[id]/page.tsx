@@ -3,18 +3,19 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { db } from '../../../db';
 import { savedRecipes } from '../../../db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import RecipeDetailSaveButton from '../../../components/RecipeDetailSaveButton';
 
 export default async function RecipeDetail({ params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
 
-  if (!session?.user) {
+  if (!session?.user?.id) {
     // Redirect to sign-in page with callback URL to return after auth
     const { id } = await params;
     redirect(`/api/auth/signin?callbackUrl=/recipe/${id}`);
   }
 
+  const userId = session.user.id;
   const { id } = await params;
 
   const res = await fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${id}`, {
@@ -51,13 +52,12 @@ export default async function RecipeDetail({ params }: { params: Promise<{ id: s
 
   // Check if recipe is saved by user
   let isSaved = false;
-  if (session?.user) {
+  if (userId) {
     const existing = await db
       .select()
       .from(savedRecipes)
       .where(
-        eq(savedRecipes.userId, session.user.id),
-        eq(savedRecipes.mealId, meal.idMeal)
+        and(eq(savedRecipes.userId, userId), eq(savedRecipes.mealId, meal.idMeal))
       )
       .limit(1);
     isSaved = existing.length > 0;
