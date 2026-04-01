@@ -7,6 +7,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import RecipeCard from '../../components/RecipeCard';
 import { unsaveRecipe } from '../../actions/recipe-actions';
 
+export const dynamic = 'force-dynamic';
+
 const CATEGORIES = [
   'All',
   'Beef',
