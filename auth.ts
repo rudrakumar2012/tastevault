@@ -61,7 +61,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     })
   ],
   secret: process.env.NEXTAUTH_SECRET,
-  baseURL: process.env.NEXTAUTH_URL,
   pages: {
     signIn: '/auth/signin', // custom sign-in page
   },
