@@ -5,49 +5,117 @@ import { motion } from 'framer-motion';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
-const features = [
-  {
-    title: 'Discover Recipes',
-    description: 'Explore thousands of recipes from around the world. Find inspiration for every occasion.',
-    icon: (
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-      </svg>
-    ),
-  },
-  {
-    title: 'Save & Organize',
-    description: 'Save your favorite recipes to your personal vault. Keep everything in one beautiful, organized place.',
-    icon: (
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-      </svg>
-    ),
-  },
-  {
-    title: 'Add Personal Notes',
-    description: 'Jot down tweaks, substitutions, and cooking tips directly on each recipe. Make it truly yours.',
-    icon: (
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-      </svg>
-    ),
-  },
-  {
-    title: 'Curated Experience',
-    description: 'Enjoy a premium interface designed for food lovers. Clean typography, smooth animations.',
-    icon: (
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-      </svg>
-    ),
-  },
-];
-
 const stats = [
   { value: '10K+', label: 'Recipes' },
   { value: '50K+', label: 'Home Cooks' },
   { value: '4.9', label: 'Rating' },
+];
+
+// 3D Floating cards for hero background
+const floatingCards = [
+  {
+    icon: (
+      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+      </svg>
+    ),
+    top: '15%',
+    left: '10%',
+    size: 'w-20 h-24',
+  },
+  {
+    icon: (
+      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+      </svg>
+    ),
+    top: '60%',
+    left: '85%',
+    size: 'w-16 h-20',
+  },
+  {
+    icon: (
+      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2v1" />
+      </svg>
+    ),
+    top: '70%',
+    left: '15%',
+    size: 'w-16 h-20',
+  },
+  {
+    icon: (
+      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+      </svg>
+    ),
+    top: '25%',
+    left: '80%',
+    size: 'w-16 h-20',
+  },
+];
+
+const bentoItems = [
+  {
+    title: 'Meal Planning',
+    description: 'Plan your weekly meals with our intuitive calendar view and generate shopping lists automatically.',
+    icon: (
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      </svg>
+    ),
+    size: 'md:col-span-2',
+  },
+  {
+    title: 'Recipe Export',
+    description: 'Export your recipes as PDF or print them in beautiful formats for your kitchen.',
+    icon: (
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+      </svg>
+    ),
+    size: '',
+  },
+  {
+    title: 'Community',
+    description: 'Share your recipes and discover creations from other home cooks worldwide.',
+    icon: (
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+      </svg>
+    ),
+    size: '',
+  },
+  {
+    title: 'Cross-Device Sync',
+    description: 'Access your recipe vault from any device. Your data syncs seamlessly in real-time.',
+    icon: (
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+      </svg>
+    ),
+    size: 'md:col-span-2',
+  },
+  {
+    title: 'Dark Mode',
+    description: 'Easy on the eyes, day or night. Beautiful dark theme with accent colors.',
+    icon: (
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+      </svg>
+    ),
+    size: '',
+  },
+  {
+    title: 'Privacy First',
+    description: 'Your recipes are yours. We never share your data and you can export anytime.',
+    icon: (
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+      </svg>
+    ),
+    size: '',
+  },
 ];
 
 export default function LandingPage() {
@@ -62,6 +130,36 @@ export default function LandingPage() {
         <div className="absolute inset-0 opacity-30">
           <div className="absolute top-0 left-1/4 w-96 h-96 bg-accent/20 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '8s' }} />
           <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '10s' }} />
+        </div>
+
+        {/* 3D Floating Cards */}
+        <div
+          className="absolute inset-0 flex items-center justify-center pointer-events-none"
+          style={{ perspective: '1000px' }}
+        >
+          {floatingCards.map((card, index) => (
+            <motion.div
+              key={index}
+              className={`absolute ${card.size} bg-surface/30 backdrop-blur-sm border border-accent/10 rounded-2xl flex items-center justify-center text-accent/50`}
+              style={{ top: card.top, left: card.left }}
+              initial={{ rotate: -15, rotateX: 10, rotateY: -10, scale: 0.8, y: 0 }}
+              animate={{
+                rotate: 15,
+                rotateX: -10,
+                rotateY: 10,
+                scale: 1,
+                y: -30,
+              }}
+              transition={{
+                duration: 8 + index * 2,
+                repeat: Infinity,
+                repeatType: 'reverse',
+                ease: 'easeInOut',
+              }}
+            >
+              {card.icon}
+            </motion.div>
+          ))}
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -152,7 +250,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* Bento Grid Section - Aceternity UI Style */}
       <section className="py-20 lg:py-32 px-4 sm:px-6 lg:px-8 bg-surface/30">
         <div className="max-w-7xl mx-auto">
           <motion.div
@@ -163,43 +261,34 @@ export default function LandingPage() {
             className="text-center mb-16"
           >
             <span className="text-accent font-medium text-sm uppercase tracking-wider">
-              Features
+              Powerful Features
             </span>
             <h2 className="text-4xl lg:text-5xl font-bold text-foreground tracking-tight mt-4 mb-4">
-              Built for Recipe Lovers
+              Built for Modern Cooks
             </h2>
             <p className="text-xl text-muted max-w-2xl mx-auto">
-              Everything you need to discover, organize, and perfect your culinary creations.
+              Everything you need to transform your cooking experience.
             </p>
           </motion.div>
 
-          {/* Features Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {features.map((feature, index) => (
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 auto-rows-auto">
+            {bentoItems.map((item, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                whileHover={{ y: -4 }}
-                className="relative overflow-hidden rounded-2xl bg-background border border-border p-6 hover:shadow-xl hover:border-accent/30 transition-all duration-300"
+                whileHover={{ y: -4, scale: 1.02 }}
+                className={`relative overflow-hidden rounded-3xl bg-surface/40 backdrop-blur-sm border border-border/50 p-6 hover:border-accent/40 transition-all duration-300 group ${item.size}`}
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-accent/5 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300" />
-
+                <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 <div className="relative z-10">
-                  <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                    <div className="text-accent">
-                      {feature.icon}
-                    </div>
+                  <div className="w-12 h-12 rounded-2xl bg-accent/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <div className="text-accent">{item.icon}</div>
                   </div>
-
-                  <h3 className="text-xl font-bold text-foreground mb-3">
-                    {feature.title}
-                  </h3>
-                  <p className="text-muted text-sm leading-relaxed">
-                    {feature.description}
-                  </p>
+                  <h3 className="text-lg font-bold text-foreground mb-2">{item.title}</h3>
+                  <p className="text-muted text-sm leading-relaxed">{item.description}</p>
                 </div>
               </motion.div>
             ))}

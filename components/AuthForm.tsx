@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { signIn, getSession } from 'next-auth/react';
+import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -96,7 +96,7 @@ export default function AuthForm({ mode: initialMode = 'signin' }: AuthFormProps
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-background">
+    <div className="min-h-screen flex items-center justify-center px-4 pt-24 pb-12 bg-background">
       <div className="w-full max-w-md">
         {/* Logo/Header */}
         <motion.div
@@ -115,14 +115,17 @@ export default function AuthForm({ mode: initialMode = 'signin' }: AuthFormProps
                 className="w-6 h-6 text-background"
                 fill="none"
                 stroke="currentColor"
-                viewBox="0 0 24 24"
+                viewBox="0 0 32 32"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                />
+                <ellipse cx="16" cy="17" rx="8" ry="5" fill="none" stroke="currentColor" strokeWidth="1.8"/>
+                <g fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="13" y1="8" x2="13" y2="14"/>
+                  <line x1="11.5" y1="14" x2="11.5" y2="19"/>
+                  <line x1="13" y1="13" x2="13" y2="20"/>
+                  <line x1="14.5" y1="14" x2="14.5" y2="19"/>
+                  <line x1="19" y1="8" x2="19" y2="14"/>
+                  <path d="M19 14 L22 20 L16 20 Z"/>
+                </g>
               </svg>
             </motion.div>
             <span className="text-2xl font-bold text-foreground tracking-tight">
@@ -142,7 +145,7 @@ export default function AuthForm({ mode: initialMode = 'signin' }: AuthFormProps
           initial={{ opacity: 0, x: mode === 'signin' ? -20 : 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
-          className="relative bg-surface border border-border rounded-2xl p-8 shadow-2xl"
+          className="relative bg-surface/50 backdrop-blur-sm border border-border rounded-2xl p-8 shadow-xl"
         >
           {/* Decorative gradient */}
           <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-accent/5 via-transparent to-transparent pointer-events-none" />
@@ -164,7 +167,7 @@ export default function AuthForm({ mode: initialMode = 'signin' }: AuthFormProps
           {/* Google Sign-In */}
           <button
             onClick={handleGoogleSignIn}
-            className="w-full flex items-center justify-center gap-3 px-4 py-3 mb-6 bg-white text-background font-medium rounded-xl hover:bg-gray-50 transition-all duration-200 border border-gray-200"
+            className="w-full flex items-center justify-center gap-3 px-4 py-3 mb-6 bg-surface border border-border text-foreground font-medium rounded-xl hover:bg-surface-hover hover:border-accent/50 transition-all duration-200"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -181,7 +184,7 @@ export default function AuthForm({ mode: initialMode = 'signin' }: AuthFormProps
               <div className="w-full border-t border-border" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-surface text-muted">or</span>
+              <span className="px-4 bg-surface/50 text-muted">or</span>
             </div>
           </div>
 
@@ -194,7 +197,7 @@ export default function AuthForm({ mode: initialMode = 'signin' }: AuthFormProps
                 exit={{ opacity: 0, height: 0 }}
                 className="overflow-hidden"
               >
-                <label htmlFor="name" className="block text-sm font-medium text-muted mb-2">
+                <label htmlFor="name" className="block text-sm font-medium text-foreground mb-2">
                   Full Name
                 </label>
                 <input
@@ -210,7 +213,7 @@ export default function AuthForm({ mode: initialMode = 'signin' }: AuthFormProps
             )}
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-muted mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
                 Email
               </label>
               <input
@@ -225,7 +228,7 @@ export default function AuthForm({ mode: initialMode = 'signin' }: AuthFormProps
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-muted mb-2">
+              <label htmlFor="password" className="block text-sm font-medium text-foreground mb-2">
                 Password
               </label>
               <input
@@ -247,7 +250,7 @@ export default function AuthForm({ mode: initialMode = 'signin' }: AuthFormProps
                 exit={{ opacity: 0, height: 0 }}
                 className="overflow-hidden"
               >
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-muted mb-2">
+                <label htmlFor="confirmPassword" className="block text-sm font-medium text-foreground mb-2">
                   Confirm Password
                 </label>
                 <input
@@ -265,10 +268,10 @@ export default function AuthForm({ mode: initialMode = 'signin' }: AuthFormProps
             {mode === 'signin' && (
               <div className="text-right">
                 <Link
-                  href="/forgot-password"
+                  href="/help"
                   className="text-sm text-accent hover:text-accent-hover transition-colors"
                 >
-                  Forgot password?
+                  Need help?
                 </Link>
               </div>
             )}
@@ -325,7 +328,14 @@ export default function AuthForm({ mode: initialMode = 'signin' }: AuthFormProps
           {/* Footer */}
           <div className="mt-6 pt-6 border-t border-border text-center">
             <p className="text-xs text-muted/70">
-              By continuing, you agree to our Terms of Service and Privacy Policy.
+              By continuing, you agree to our{' '}
+              <Link href="/terms" className="text-accent hover:underline">
+                Terms
+              </Link>{' '}
+              and{' '}
+              <Link href="/privacy" className="text-accent hover:underline">
+                Privacy Policy
+              </Link>
             </p>
           </div>
         </motion.div>
