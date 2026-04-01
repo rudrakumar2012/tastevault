@@ -1,82 +1,265 @@
-'use client'
+'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useSession, signIn, signOut } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
+
+const NAV_ITEMS = [
+  { href: '/discover', label: 'Discover' },
+];
 
 export default function Navbar() {
   const [query, setQuery] = useState('');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const router = useRouter();
   const { data: session, status } = useSession();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (query.trim()) {
-      router.push(`/?q=${encodeURIComponent(query)}`);
+      router.push(`/discover?q=${encodeURIComponent(query)}`);
+      setQuery('');
     }
   };
 
   return (
-    <nav style={{ padding: '20px 40px', backgroundColor: '#18181B', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #333' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '30px' }}>
-        <Link href="/" style={{ color: '#69F6B8', fontSize: '1.5rem', fontWeight: 'bold', textDecoration: 'none' }}>
-          TasteVault
-        </Link>
-        <Link href="/" style={{ color: '#E4E4E7', textDecoration: 'none', fontWeight: '500' }}>
-          Discovery
-        </Link>
-        {session?.user && (
-          <Link href="/dashboard" style={{ color: '#E4E4E7', textDecoration: 'none', fontWeight: '500' }}>
-            My Vault
-          </Link>
-        )}
-      </div>
-
-      <form onSubmit={handleSearch} style={{ display: 'flex', gap: '10px' }}>
-        <input
-          type="text"
-          placeholder="Search recipes (e.g., beef)..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          style={{ padding: '8px 16px', borderRadius: '6px', border: '1px solid #333', backgroundColor: '#0B0E14', color: '#FFF', outline: 'none' }}
-        />
-        <button type="submit" style={{ padding: '8px 16px', borderRadius: '6px', backgroundColor: '#69F6B8', color: '#0B0E14', border: 'none', fontWeight: 'bold', cursor: 'pointer' }}>
-          Search
-        </button>
-      </form>
-
-      <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-        {status === 'loading' ? (
-          <span style={{ color: '#A1A1AA', fontSize: '14px' }}>Loading...</span>
-        ) : session?.user ? (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span style={{ color: '#E4E4E7', fontSize: '14px' }}>
-              {session.user.name || session.user.email}
-            </span>
-            {session.user.image && (
-              <img
-                src={session.user.image}
-                alt={session.user.name || 'User'}
-                style={{ width: '32px', height: '32px', borderRadius: '50%', border: '2px solid #69F6B8' }}
-              />
-            )}
-            <button
-              onClick={() => signOut({ redirect: true, callbackUrl: '/' })}
-              style={{ padding: '6px 12px', borderRadius: '6px', backgroundColor: '#3f3f46', color: '#E4E4E7', border: 'none', cursor: 'pointer', fontSize: '14px' }}
+    <motion.nav
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
+      className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-surface/80 border-b border-white/5"
+      style={{
+        backgroundColor: 'rgba(20, 20, 20, 0.8)',
+        backdropFilter: 'blur(20px) saturate(180%)',
+      }}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 lg:h-20">
+          {/* Logo */}
+          <Link
+            href="/"
+            className="flex items-center gap-2 group"
+            aria-label="TasteVault home"
+          >
+            <motion.div
+              whileHover={{ rotate: 5, scale: 1.05 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 10 }}
+              className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center"
             >
-              Sign out
+              <svg
+                className="w-5 h-5 text-background"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                />
+              </svg>
+            </motion.div>
+            <span className="text-xl lg:text-2xl font-bold text-foreground tracking-tight">
+              TasteVault
+            </span>
+          </Link>
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center gap-8">
+            {NAV_ITEMS.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="text-sm font-medium text-muted hover:text-accent transition-colors duration-200 relative group"
+              >
+                {item.label}
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent transition-all duration-300 group-hover:w-full" />
+              </Link>
+            ))}
+            {session?.user && (
+              <Link
+                href="/my-kitchen"
+                className="text-sm font-medium text-muted hover:text-accent transition-colors duration-200 relative group"
+              >
+                My Kitchen
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent transition-all duration-300 group-hover:w-full" />
+              </Link>
+            )}
+          </div>
+
+          {/* Search & Auth */}
+          <div className="flex items-center gap-3 lg:gap-4">
+            {/* Search Bar */}
+            <form onSubmit={handleSearch} className="relative hidden sm:block">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search recipes..."
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  className="w-48 lg:w-64 px-4 py-2 pl-10 bg-surface border border-border rounded-full text-sm text-foreground placeholder-muted/50 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/20 transition-all duration-200"
+                />
+                <svg
+                  className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+              </div>
+            </form>
+
+            {/* Auth Section */}
+            {status === 'loading' ? (
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+                <span className="text-sm text-muted">Loading...</span>
+              </div>
+            ) : session?.user ? (
+              <div className="flex items-center gap-3">
+                <div className="hidden sm:flex items-center gap-2">
+                  <span className="text-sm text-muted">
+                    {session.user.name || session.user.email?.split('@')[0]}
+                  </span>
+                </div>
+                {session.user.image && (
+                  <img
+                    src={session.user.image}
+                    alt={session.user.name || 'User'}
+                    className="w-9 h-9 rounded-full border-2 border-accent/50 hover:border-accent transition-all duration-200 object-cover"
+                  />
+                )}
+                <div className="relative group">
+                  <button
+                    onClick={() => signOut({ redirect: true, callbackUrl: '/' })}
+                    className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-muted hover:text-foreground hover:bg-surface rounded-full transition-all duration-200"
+                    aria-label="Sign out"
+                  >
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                      />
+                    </svg>
+                    <span className="hidden lg:inline">Sign out</span>
+                  </button>
+                  <div className="absolute right-0 top-full mt-1 w-32 bg-surface border border-border rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 py-1">
+                    <Link
+                      href="/my-kitchen"
+                      className="block px-4 py-2 text-sm text-muted hover:text-foreground hover:bg-surface-hover transition-colors"
+                    >
+                      My Kitchen
+                    </Link>
+                    <button
+                      onClick={() => signOut({ redirect: true, callbackUrl: '/' })}
+                      className="w-full text-left px-4 py-2 text-sm text-muted hover:text-foreground hover:bg-surface-hover transition-colors"
+                    >
+                      Sign out
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <Link
+                  href="/auth/signin"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-accent text-background text-sm font-semibold rounded-full hover:bg-accent-hover transition-all duration-200 shadow-lg shadow-accent/20 hover:shadow-accent/30"
+                >
+                  <span>Sign in</span>
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                </Link>
+              </motion.div>
+            )}
+
+            {/* Mobile menu button */}
+            <button
+              className="md:hidden p-2 text-muted hover:text-foreground"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              aria-label="Toggle menu"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                {isMobileMenuOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                )}
+              </svg>
             </button>
           </div>
-        ) : (
-          <Link
-            href="/auth/signin"
-            style={{ padding: '8px 16px', borderRadius: '6px', backgroundColor: '#69F6B8', color: '#0B0E14', textDecoration: 'none', fontWeight: 'bold' }}
-          >
-            Sign in
-          </Link>
-        )}
+        </div>
+
+        {/* Mobile Menu */}
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="md:hidden overflow-hidden pb-4"
+            >
+              <div className="pt-4 pb-2 border-t border-border mt-2">
+                <form onSubmit={handleSearch} className="mb-4">
+                  <input
+                    type="text"
+                    placeholder="Search recipes..."
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    className="w-full px-4 py-2.5 bg-surface border border-border rounded-full text-sm text-foreground placeholder-muted/50 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/20"
+                  />
+                </form>
+                {NAV_ITEMS.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="block py-3 text-base font-medium text-muted hover:text-accent transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+                {session?.user && (
+                  <Link
+                    href="/my-kitchen"
+                    className="block py-3 text-base font-medium text-muted hover:text-accent transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    My Kitchen
+                  </Link>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
-    </nav>
+    </motion.nav>
   );
 }

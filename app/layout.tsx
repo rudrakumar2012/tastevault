@@ -9,7 +9,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body style={{ backgroundColor: '#0B0E14', margin: 0 }}>
+      <body>
         <SessionProvider>
           <Navbar />
           {children}

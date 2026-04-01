@@ -9,7 +9,9 @@
       "Bash(cat drizzle/*.sql)",
       "Bash(npx drizzle-kit:*)",
       "Bash(git add:*)",
-      "Bash(git reset:*)"
+      "Bash(git reset:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)"
     ]
   }
 }

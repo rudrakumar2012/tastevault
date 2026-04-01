@@ -6,7 +6,13 @@ import { db } from '../db';
 import { savedRecipes } from '../db/schema';
 import { eq } from 'drizzle-orm';
 
-export async function saveApiRecipe(title: string, category: string, mealId: string, image?: string) {
+export async function saveApiRecipe(
+  title: string,
+  category: string,
+  mealId: string,
+  image?: string,
+  note?: string
+) {
   const session = await auth();
 
   if (!session?.user) {
@@ -21,7 +27,15 @@ export async function saveApiRecipe(title: string, category: string, mealId: str
     .limit(1);
 
   if (existing.length > 0) {
-    // Already saved, no need to insert
+    // Already saved, update note if provided
+    if (note !== undefined) {
+      await db
+        .update(savedRecipes)
+        .set({ note: note.trim() || null })
+        .where(eq(savedRecipes.userId, session.user.id), eq(savedRecipes.mealId, mealId));
+      revalidatePath('/dashboard');
+      return { success: true, message: 'Note updated' };
+    }
     return { success: true, message: 'Recipe already saved' };
   }
 
@@ -32,12 +46,12 @@ export async function saveApiRecipe(title: string, category: string, mealId: str
     title,
     image: image || null,
     category: category || null,
-    note: '',
+    note: note?.trim() || null,
   });
 
   // Refreshes the page data silently
   revalidatePath('/');
-  revalidatePath('/dashboard');
+  revalidatePath('/my-kitchen');
 
   return { success: true, message: 'Recipe saved to vault' };
 }
@@ -54,7 +68,7 @@ export async function unsaveRecipe(mealId: string) {
     .where(eq(savedRecipes.userId, session.user.id), eq(savedRecipes.mealId, mealId));
 
   revalidatePath('/');
-  revalidatePath('/dashboard');
+  revalidatePath('/my-kitchen');
 
   return { success: true, message: 'Recipe removed from vault' };
 }
@@ -71,7 +85,7 @@ export async function updateRecipeNote(mealId: string, note: string) {
     .set({ note: note.trim() || null })
     .where(eq(savedRecipes.userId, session.user.id), eq(savedRecipes.mealId, mealId));
 
-  revalidatePath('/dashboard');
+  revalidatePath('/my-kitchen');
 
   return { success: true, message: 'Note updated' };
 }
