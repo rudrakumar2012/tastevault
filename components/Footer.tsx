@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 
 const footerLinks = {
   Product: [
-    { label: 'Discover', href: '/discover' },
+    { label: 'Discover Recipes', href: '/discover' },
     { label: 'My Kitchen', href: '/my-kitchen' },
   ],
   Company: [
@@ -17,8 +17,8 @@ const footerLinks = {
     { label: 'Contact', href: '/contact' },
   ],
   Legal: [
-    { label: 'Privacy', href: '/privacy' },
-    { label: 'Terms', href: '/terms' },
+    { label: 'Privacy Policy', href: '/privacy' },
+    { label: 'Terms of Service', href: '/terms' },
   ],
 };
 
