@@ -19,7 +19,7 @@ export default function PrivacyPage() {
 
           <div className="prose prose-invert max-w-none text-muted space-y-6">
             <p className="text-lg leading-relaxed">
-              Last updated: March 2025
+              Last updated: April 2026
             </p>
 
             <section>
