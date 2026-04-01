@@ -208,10 +208,10 @@ export default function MyKitchenPage() {
                     disabled={savingNote === savedRecipe.mealId}
                   />
                   {savingNote === savedRecipe.mealId && (
-                    <p className="text-xs text-accent mt-2 flex items-center gap-2">
+                    <div className="text-xs text-accent mt-2 flex items-center gap-2">
                       <div className="w-3 h-3 border-2 border-accent/30 border-t-accent rounded-full animate-spin" />
                       Saving...
-                    </p>
+                    </div>
                   )}
                 </div>
               </motion.div>
