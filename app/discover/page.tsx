@@ -1,13 +1,11 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import RecipeCard from '../../components/RecipeCard';
 import { unsaveRecipe } from '../../actions/recipe-actions';
-
-export const dynamic = 'force-dynamic';
 
 const CATEGORIES = [
   'All',
@@ -34,7 +32,7 @@ const SUGGESTED_SEARCHES = [
   'Vegetable Stir Fry',
 ];
 
-export default function DiscoverPage() {
+function DiscoverContent() {
   const { data: session } = useSession();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -350,5 +348,20 @@ export default function DiscoverPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function DiscoverPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-background pt-24 pb-16 flex items-center justify-center">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 border-3 border-accent border-t-transparent rounded-full animate-spin" />
+          <span className="text-muted text-lg">Loading...</span>
+        </div>
+      </div>
+    }>
+      <DiscoverContent />
+    </Suspense>
   );
 }
