@@ -45,6 +45,8 @@ function DiscoverContent() {
   const [savedRecipeIds, setSavedRecipeIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isClient, setIsClient] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
 
   const activeFilters = query || selectedCategory !== 'All';
 
@@ -65,6 +67,19 @@ function DiscoverContent() {
     }
   }, [session]);
 
+  // Handle client-side detection for responsive behavior
+  useEffect(() => {
+    setIsClient(true);
+    setIsDesktop(window.innerWidth >= 1024);
+
+    const handleResize = () => {
+      setIsDesktop(window.innerWidth >= 1024);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   // Fetch recipes from Themealdb
   useEffect(() => {
     const fetchRecipes = async () => {
@@ -72,18 +87,53 @@ function DiscoverContent() {
       setError(null);
 
       try {
-        const searchQuery = query || 'chicken';
-        const res = await fetch(
-          `https://www.themealdb.com/api/json/v1/1/search.php?s=${encodeURIComponent(searchQuery)}`
-        );
-        const data = await res.json();
-        const fetched = data.meals || [];
+        // If search query exists, fetch by search
+        if (query) {
+          const res = await fetch(
+            `https://www.themealdb.com/api/json/v1/1/search.php?s=${encodeURIComponent(query)}`
+          );
+          const data = await res.json();
+          const fetched = Array.isArray(data.meals) ? data.meals : [];
 
-        const filtered = selectedCategory === 'All'
-          ? fetched
-          : fetched.filter((meal: any) => meal.strCategory === selectedCategory);
+          // Apply category filter if selected
+          const filtered = selectedCategory !== 'All'
+            ? fetched.filter((meal: any) => meal.strCategory === selectedCategory)
+            : fetched;
 
-        setRecipes(filtered);
+          setRecipes(Array.isArray(filtered) ? filtered : []);
+          return;
+        }
+
+        // If category selected (not All), fetch by filter
+        if (selectedCategory !== 'All') {
+          const res = await fetch(
+            `https://www.themealdb.com/api/json/v1/1/filter.php?c=${encodeURIComponent(selectedCategory)}`
+          );
+          const data = await res.json();
+          const fetched = Array.isArray(data.meals) ? data.meals : [];
+          setRecipes(fetched);
+          return;
+        }
+
+        // No filters: fetch random meals to ensure variety on each refresh
+        const fetchRandom = async (count: number) => {
+          const promises = Array.from({ length: count }).map(() =>
+            fetch('https://www.themealdb.com/api/json/v1/1/random.php').then(r => r.json())
+          );
+          const results = await Promise.all(promises);
+          return results.flatMap(d => Array.isArray(d.meals) ? d.meals : []);
+        };
+
+        // Fetch more than needed to dedupe and ensure at least 20 unique meals
+        const randomMeals = await fetchRandom(30);
+        const seen = new Set<string>();
+        const uniqueRandom = randomMeals.filter(meal => {
+          if (seen.has(meal.idMeal)) return false;
+          seen.add(meal.idMeal);
+          return true;
+        });
+
+        setRecipes(uniqueRandom);
       } catch (err) {
         setError('Failed to load recipes. Please try again.');
         console.error(err);
@@ -209,7 +259,7 @@ function DiscoverContent() {
 
           {/* Category Filters */}
           <AnimatePresence>
-            {(showFilters || typeof window !== 'undefined' && window.innerWidth >= 1024) && (
+            {(showFilters || isDesktop) && (
               <motion.div
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: 'auto', opacity: 1 }}

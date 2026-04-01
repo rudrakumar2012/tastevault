@@ -11,7 +11,10 @@
       "Bash(git add:*)",
       "Bash(git reset:*)",
       "Bash(git commit:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(powershell -Command \"Resolve-Path 'app/api/auth/register/route.ts' | Split-Path -Parent | Split-Path -Parent | Split-Path -Parent | Split-Path -Parent\")",
+      "Bash(git diff:*)",
+      "Bash(grep -E '\\\\.tsx?$')"
     ]
   }
 }

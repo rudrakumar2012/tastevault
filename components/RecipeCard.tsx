@@ -32,11 +32,8 @@ export default function RecipeCard({
   const [isSaved, setIsSaved] = useState(initialIsSaved);
   const [isSaving, setIsSaving] = useState(false);
   const [isUnsaving, setIsUnsaving] = useState(false);
-  const [showNoteOverlay, setShowNoteOverlay] = useState(false);
-  const [noteText, setNoteText] = useState('');
-  const [isSubmittingNote, setIsSubmittingNote] = useState(false);
 
-  const handleSaveClick = (e: React.MouseEvent) => {
+  const handleSaveClick = async (e: React.MouseEvent) => {
     e.preventDefault();
     if (!session) {
       router.push('/auth/signin');
@@ -46,7 +43,22 @@ export default function RecipeCard({
     if (isSaved) {
       handleUnsave(e);
     } else {
-      setShowNoteOverlay(true);
+      setIsSaving(true);
+      try {
+        await saveApiRecipe(
+          recipe.strMeal,
+          recipe.strCategory,
+          recipe.idMeal,
+          recipe.strMealThumb,
+          undefined // no note required on save; can add later in My Kitchen
+        );
+        setIsSaved(true);
+        onSave?.();
+      } catch (error) {
+        console.error('Failed to save recipe:', error);
+      } finally {
+        setIsSaving(false);
+      }
     }
   };
 
@@ -69,36 +81,6 @@ export default function RecipeCard({
     }
   };
 
-  const handleSubmitNote = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    setIsSubmittingNote(true);
-    try {
-      await saveApiRecipe(
-        recipe.strMeal,
-        recipe.strCategory,
-        recipe.idMeal,
-        recipe.strMealThumb,
-        noteText.trim() || undefined
-      );
-      onSave?.();
-      setShowNoteOverlay(false);
-      setNoteText('');
-      setIsSaved(true);
-    } catch (error) {
-      console.error('Failed to save recipe:', error);
-    } finally {
-      setIsSubmittingNote(false);
-    }
-  };
-
-  const handleCancelNote = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setShowNoteOverlay(false);
-    setNoteText('');
-  };
 
   const isAuthenticated = !!session;
 
@@ -114,7 +96,6 @@ export default function RecipeCard({
       <Link
         href={`/recipe/${recipe.idMeal}`}
         className="relative aspect-[4/3] overflow-hidden"
-        onClick={(e) => showNoteOverlay && e.preventDefault()}
       >
         <motion.img
           src={recipe.strMealThumb}
@@ -131,142 +112,83 @@ export default function RecipeCard({
           </span>
         </div>
 
-        {/* Save Button Overlay */}
-        <AnimatePresence>
-          {showNoteOverlay && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-background/95 backdrop-blur-md flex items-center justify-center p-6"
-            >
-              <motion.div
-                initial={{ scale: 0.95, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.95, opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                className="w-full max-w-sm"
-              >
-                <h3 className="text-lg font-semibold text-foreground mb-2">
-                  Add a note (optional)
-                </h3>
-                <p className="text-sm text-muted mb-4">
-                  Jot down any tweaks or tips for this recipe
-                </p>
-                <textarea
-                  autoFocus
-                  value={noteText}
-                  onChange={(e) => setNoteText(e.target.value)}
-                  placeholder="e.g., Add extra garlic, cook 5 min longer..."
-                  className="w-full h-32 px-4 py-3 bg-surface border border-border rounded-xl text-sm text-foreground placeholder-muted/50 focus:outline-none focus:border-accent resize-none"
-                  maxLength={500}
-                />
-                <div className="flex items-center justify-between mt-4 gap-3">
-                  <button
-                    onClick={handleCancelNote}
-                    disabled={isSubmittingNote}
-                    className="flex-1 px-4 py-2.5 text-sm font-medium text-muted hover:text-foreground bg-surface border border-border rounded-xl transition-all duration-200 disabled:opacity-50"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleSubmitNote}
-                    disabled={isSubmittingNote}
-                    className="flex-1 px-4 py-2.5 text-sm font-semibold text-background bg-accent rounded-xl hover:bg-accent-hover transition-all duration-200 disabled:opacity-50 shadow-lg shadow-accent/20"
-                  >
-                    {isSubmittingNote ? (
-                      <span className="flex items-center justify-center gap-2">
-                        <div className="w-4 h-4 border-2 border-background/30 border-t-background rounded-full animate-spin" />
-                        Saving...
-                      </span>
-                    ) : (
-                      'Save Recipe'
-                    )}
-                  </button>
-                </div>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
 
-        {/* Quick Action Save Button (visible when not showing overlay) */}
-        {!showNoteOverlay && (
-          <div className="absolute bottom-3 right-3">
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={handleSaveClick}
-              disabled={isSaving || isUnsaving}
-              className={`
-                flex items-center justify-center w-12 h-12 rounded-full shadow-lg backdrop-blur-sm border transition-all duration-300
-                ${isSaved
-                  ? 'bg-red-500/90 border-red-500/50 text-white hover:bg-red-600'
-                  : isAuthenticated
-                    ? 'bg-accent/90 border-accent/50 text-background hover:bg-accent'
-                    : 'bg-muted/50 border-muted/30 text-muted cursor-not-allowed'
-                }
-                ${(isSaving || isUnsaving) ? 'opacity-60 pointer-events-none' : ''}
-              `}
-              aria-label={isSaved ? 'Unsave recipe' : 'Save recipe'}
-            >
-              <AnimatePresence mode="wait">
-                {isUnsaving ? (
-                  <motion.div
-                    key="unsaving"
-                    initial={{ rotate: -90, opacity: 0 }}
-                    animate={{ rotate: 0, opacity: 1 }}
-                    exit={{ rotate: 90, opacity: 0 }}
-                    className="w-5 h-5 border-2 border-current border-t-transparent rounded-full"
+        {/* Quick Action Save Button */}
+        <div className="absolute bottom-3 right-3">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={handleSaveClick}
+            disabled={isSaving || isUnsaving}
+            className={`
+              flex items-center justify-center w-12 h-12 rounded-full shadow-lg backdrop-blur-sm border transition-all duration-300
+              ${isSaved
+                ? 'bg-red-500/90 border-red-500/50 text-white hover:bg-red-600'
+                : isAuthenticated
+                  ? 'bg-accent/90 border-accent/50 text-background hover:bg-accent'
+                  : 'bg-muted/50 border-muted/30 text-muted cursor-not-allowed'
+              }
+              ${(isSaving || isUnsaving) ? 'opacity-60 pointer-events-none' : ''}
+            `}
+            aria-label={isSaved ? 'Unsave recipe' : 'Save recipe'}
+          >
+            <AnimatePresence mode="wait">
+              {isUnsaving ? (
+                <motion.div
+                  key="unsaving"
+                  initial={{ rotate: -90, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  exit={{ rotate: 90, opacity: 0 }}
+                  className="w-5 h-5 border-2 border-current border-t-transparent rounded-full"
+                />
+              ) : isSaving ? (
+                <motion.div
+                  key="saving"
+                  initial={{ rotate: -90, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  exit={{ rotate: 90, opacity: 0 }}
+                  className="w-5 h-5 border-2 border-current border-t-transparent rounded-full"
+                />
+              ) : isSaved ? (
+                <motion.svg
+                  key="saved"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  exit={{ scale: 0 }}
+                  className="w-5 h-5"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                </motion.svg>
+              ) : (
+                <motion.svg
+                  key="unsaved"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  exit={{ scale: 0 }}
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
                   />
-                ) : isSaving ? (
-                  <motion.div
-                    key="saving"
-                    initial={{ rotate: -90, opacity: 0 }}
-                    animate={{ rotate: 0, opacity: 1 }}
-                    exit={{ rotate: 90, opacity: 0 }}
-                    className="w-5 h-5 border-2 border-current border-t-transparent rounded-full"
-                  />
-                ) : isSaved ? (
-                  <motion.svg
-                    key="saved"
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    exit={{ scale: 0 }}
-                    className="w-5 h-5"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                  </motion.svg>
-                ) : (
-                  <motion.svg
-                    key="unsaved"
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    exit={{ scale: 0 }}
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                    />
-                  </motion.svg>
-                )}
-              </AnimatePresence>
-            </motion.button>
-          </div>
-        )}
+                </motion.svg>
+              )}
+            </AnimatePresence>
+          </motion.button>
+        </div>
       </Link>
 
       {/* Content */}
       <div className="flex flex-col flex-1 p-4">
         <div className="flex-1">
-          <Link href={`/recipe/${recipe.idMeal}`} onClick={(e) => showNoteOverlay && e.preventDefault()}>
+          <Link href={`/recipe/${recipe.idMeal}`}>
             <h3 className="text-lg font-semibold text-foreground leading-snug group-hover:text-accent transition-colors duration-200 mb-2 line-clamp-2">
               {recipe.strMeal}
             </h3>

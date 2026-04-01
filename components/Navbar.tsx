@@ -133,7 +133,7 @@ export default function Navbar() {
             ) : session?.user ? (
               <div className="flex items-center gap-3">
                 <div className="hidden sm:flex items-center gap-2">
-                  <span className="text-sm text-muted">
+                  <span className="px-3 py-1 text-sm font-semibold bg-accent/10 text-accent border border-accent/20 rounded-full hover:bg-accent/20 transition-all duration-200">
                     {session.user.name || session.user.email?.split('@')[0]}
                   </span>
                 </div>
