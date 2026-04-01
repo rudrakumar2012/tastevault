@@ -50,7 +50,7 @@ export default function MyKitchenPage() {
   const handleSaveNote = async (mealId: string, note: string) => {
     setSavingNote(mealId);
     try {
-      await updateRecipeNote(mealId, note.trim() || undefined);
+      await updateRecipeNote(mealId, note.trim());
       setUserSavedRecipes(prev =>
         prev.map(r =>
           r.mealId === mealId
