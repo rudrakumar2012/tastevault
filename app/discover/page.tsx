@@ -54,7 +54,7 @@ export default function DiscoverPage() {
       fetch('/api/saved-recipes')
         .then(res => res.json())
         .then(data => {
-          const ids = new Set(data.map((r: { mealId: string }) => r.mealId));
+          const ids: Set<string> = new Set(data.map((r: any) => r.mealId));
           setSavedRecipeIds(ids);
         })
         .catch(err => {
